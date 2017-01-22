@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
+using Delimon.Win32.IO;
 
 namespace syncDocument
 {
@@ -124,20 +124,16 @@ namespace syncDocument
            {
                subFiles = new Dictionary<string, BaseItem>();
                DirectoryInfo dif = new DirectoryInfo(getFullFileName());
-               System.IO.FileSystemInfo[] flist = dif.GetFileSystemInfos();
-               foreach (FileSystemInfo finfo in flist)
-               {
-                   if (finfo is FileInfo)
-                   {
-                       FileItem f = new FileItem(finfo.Name, this);                   
-                       subFiles[f.getIndexName()] = f;
-                   }
-                   else
-                   {
-                       FolderItem f = new FolderItem(finfo.Name, this);
-                       subFiles[f.getIndexName()] = f;
-                   }
-               }
+                foreach(FileInfo finfo in dif.GetFiles())
+                {
+                    FileItem f = new FileItem(finfo.Name, this);
+                    subFiles[f.getIndexName()] = f;
+                }
+                foreach (DirectoryInfo finfo in dif.GetDirectories())
+                {
+                    FolderItem f = new FolderItem(finfo.Name, this);
+                    subFiles[f.getIndexName()] = f;
+                }
            }
            return subFiles;
        }
@@ -189,7 +185,7 @@ namespace syncDocument
         {
             try
             {
-                FileStream file = new FileStream(fileName, FileMode.Open,FileAccess.Read);
+                System.IO.FileStream file = new System.IO.FileStream(fileName, System.IO.FileMode.Open,System.IO.FileAccess.Read);
                 System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
                 byte[] retVal = md5.ComputeHash(file);
                 file.Close();
